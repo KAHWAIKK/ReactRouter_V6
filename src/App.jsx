@@ -6,10 +6,10 @@ import About from './About';
 import ErrorPage from './ErrorPage';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-//import { format } from 'date-fns';
+import { format } from 'date-fns';
 
 function App() {
-  const[posts,setPosts]= useState([
+  const [posts, setPosts] = useState([
     {
       id: 1,
       title: "My First Post",
@@ -35,34 +35,62 @@ function App() {
       body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!"
     }
   ])
-  const[ search,setSearch] = useState("")
-  const[ searchResults,setSearchResults] = useState([])
- 
-  return (
-      <Routes>
-        {/* Top level route that supports our layout that contains the header,nav and footer and all other content is in the outlet component that is imported */}
-        <Route path="/" element = {<Layout
-          search={search}
-          setSearch={setSearch}
-          />}>
-            {/* When we acces the items in the outlet component,we get the Home component by default(index)  */}
-          <Route index element={<Home posts={posts} />}/>
-            <Route path="post">
-              < Route index element={<NewPost 
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [postTitle, setPostTitle] = useState('');
+  const [postBody, setPostBody] = useState('');
+  const navigate = useNavigate();
 
-              />}
-            />
-            <Route path=':id' 
-                  element={<PostPage
-              
-                    />}
-            />
-          </Route>
-          <Route path="about" element={<About/>} />
-          <Route path="*" element={<ErrorPage/>} />
+  useEffect(() => {
+    const filteredResults = posts.filter((post) =>
+      ((post.body).toLowerCase()).includes(search.toLowerCase())
+      || ((post.title).toLowerCase()).includes(search.toLowerCase()));
+
+    setSearchResults(filteredResults.reverse());
+  }, [posts, search])
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const newPost = { id, title: postTitle, datetime, body: postBody };
+    const allPosts = [...posts, newPost];
+    setPosts(allPosts);
+    setPostTitle('');
+    setPostBody('');
+    navigate('/');
+  }
+
+  const handleDelete = (id) => {
+    const postsList = posts.filter(post => post.id !== id);
+    setPosts(postsList);
+    navigate('/');
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Layout
+        search={search}
+        setSearch={setSearch}
+      />}>
+        <Route index element={<Home posts={searchResults} />} />
+        <Route path="post">
+          <Route index element={<NewPost
+            handleSubmit={handleSubmit}
+            postTitle={postTitle}
+            setPostTitle={setPostTitle}
+            postBody={postBody}
+            setPostBody={setPostBody}
+          />} />
+          <Route path=":id" element={<PostPage
+            posts={posts}
+            handleDelete={handleDelete}
+          />} />
         </Route>
-      </Routes>
-      
+        <Route path="about" element={<About />} />
+        <Route path="*" element={<ErrorPage />} />
+      </Route>
+    </Routes>
   );
 }
 
