@@ -1,18 +1,6 @@
 {
   "posts": [
     {
-      "id": 2,
-      "title": "React Fundamentals",
-      "datetime": "October 05, 2023 8:58:27 AM",
-      "body": "etg"
-    },
-    {
-      "id": 3,
-      "title": "Axios",
-      "datetime": "October 05, 2023 9:37:16 AM",
-      "body": "ljg"
-    },
-    {
       "id": 4,
       "title": "cyuk",
       "datetime": "October 05, 2023 9:41:41 AM",
