@@ -9,7 +9,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api from './api/posts';
-import useWindowSize from './hooks/useWindowSize';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 
 function App() {
@@ -21,10 +21,15 @@ function App() {
   const [editTitle, setEditTitle] = useState('');
   const [editBody, setEditBody] = useState('');
   const navigate = useNavigate();
+  const {data,fetchError,isLoading} = useAxiosFetch(
+    "http://localhost:3800/posts"
+  )
   
-
+ useEffect(() => {
+  setPosts(data)
+ },[data])
   /* Combining useEffect and Axios package to handle GET requests */
-  useEffect(() => {
+ /*  useEffect(() => {
     const fetchPosts = async() => {
       try {
         const response = await api.get('/posts')
@@ -44,7 +49,7 @@ function App() {
         }
     }
     fetchPosts();
-  },[]);
+  },[]); */
 
   useEffect(() => {
     const filteredResults = posts.filter((post) =>
@@ -109,7 +114,11 @@ function App() {
         search={search}
         setSearch={setSearch}
       />}>
-        <Route index element={<Home posts={searchResults} />} />
+        <Route index element={<Home 
+        posts={searchResults}
+        fetchError={fetchError}
+        isLoading={isLoading}
+         />} />
         <Route path="post">
           <Route index element={<NewPost
             handleSubmit={handleSubmit}
